@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="fw-bold mb-4">Transaction History</h2>
+
+{% if txns %}
+<div class="table-responsive shadow-sm">
+  <table class="table align-middle table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Type</th>
+        <th scope="col">Amount (₹)</th>
+        <th scope="col">Receiver / Note</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for txn in txns %}
+      <tr class="
+        {% if txn.type == 'Deposit' %}table-success
+        {% elif txn.type == 'Withdraw' %}table-danger
+        {% elif txn.type == 'Transfer Sent' %}table-warning
+        {% elif txn.type == 'Transfer Received' %}table-info
+        {% endif %}
+      ">
+        <td>{{ loop.index }}</td>
+        <td>
+          {% if txn.type == 'Deposit' %}
+            <i class="bi bi-arrow-down-circle-fill text-success"></i> Deposit
+          {% elif txn.type == 'Withdraw' %}
+            <i class="bi bi-arrow-up-circle-fill text-danger"></i> Withdraw
+          {% elif txn.type == 'Transfer Sent' %}
+            <i class="bi bi-arrow-left-right text-warning"></i> Sent
+          {% else %}
+            <i class="bi bi-arrow-left-right text-info"></i> Received
+          {% endif %}
+        </td>
+        <td><strong>₹{{ "%.2f"|format(txn.amount) }}</strong></td>
+        <td>{{ txn.note or "—" }}</td>
+        <td>{{ txn.timestamp.strftime("%d-%m-%Y %I:%M %p") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-secondary">No transactions yet.</div>
+{% endif %}
+{% endblock %}

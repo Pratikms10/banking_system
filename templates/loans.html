@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="fw-bold mb-4">My Loans</h2>
+
+<!-- Apply for Loan Button -->
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#applyLoanModal">
+  <i class="bi bi-plus-circle"></i> Apply for Loan
+</button>
+
+<!-- Loans Table -->
+{% if loans %}
+<div class="table-responsive shadow-sm">
+  <table class="table table-striped align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Type</th>
+        <th>Amount (₹)</th>
+        <th>Interest (%)</th>
+        <th>Tenure (months)</th>
+        <th>EMI (₹)</th>
+        <th>Status</th>
+        <th>Applied On</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for loan in loans %}
+      <tr>
+        <td>{{ loan.loan_type }}</td>
+        <td><strong>₹{{ "%.2f"|format(loan.amount) }}</strong></td>
+        <td>{{ "%.2f"|format(loan.interest_rate) }}</td>
+        <td>{{ loan.tenure }}</td>
+        <td>₹{{ "%.2f"|format(loan.emi) }}</td>
+        <td>
+          {% if loan.status == 'Pending' %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% elif loan.status == 'Approved' %}
+            <span class="badge bg-success">Approved</span>
+          {% else %}
+            <span class="badge bg-danger">Rejected</span>
+          {% endif %}
+        </td>
+        <td>{{ loan.applied_on.strftime("%d-%m-%Y %I:%M %p") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-secondary">No loans found. Apply for one below!</div>
+{% endif %}
+
+<!-- Apply Loan Modal -->
+<div class="modal fade" id="applyLoanModal" tabindex="-1" aria-labelledby="applyLoanModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('loans') }}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="applyLoanModalLabel">Apply for Loan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Loan Type</label>
+            <select class="form-select" name="loan_type" required>
+              <option value="">Select Type</option>
+              <option>Personal Loan</option>
+              <option>Home Loan</option>
+              <option>Car Loan</option>
+              <option>Education Loan</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Loan Amount (₹)</label>
+            <input type="number" class="form-control" name="amount" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Interest Rate (%)</label>
+            <input type="number" step="0.1" class="form-control" name="interest" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tenure (in months)</label>
+            <input type="number" class="form-control" name="tenure" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Submit Loan Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
